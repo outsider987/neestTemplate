@@ -1,0 +1,39 @@
+version: '3.8'
+
+networks:
+  default:
+    name: mcc-network
+
+services:
+  app:
+    container_name: sunlife-hmg-app
+    image: node:18.8-alpine
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 3000:3000
+    command: npm run start:dev
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+
+  redis:
+    container_name: sunlife-hmg-redis
+    image: redis:6.2.7
+
+  db:
+    container_name: sunlife-hmg-db
+    image: mysql:8.0.30
+    ports:
+      - 3306:3306
+    volumes:
+      - ~/Documents/MediConCen/Database/sunlife-hmg-db:/var/lib/mysql:delegated
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456!
+      - MYSQL_DATABASE=sunlife-hmg-db
+      - MYSQL_USER=mcc_user
+      - MYSQL_PASSWORD=123456!
+    command: --default-authentication-plugin=mysql_native_password
